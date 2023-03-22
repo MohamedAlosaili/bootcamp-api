@@ -5,6 +5,7 @@ const express = require("express");
 const morgan = require("morgan");
 const colors = require("colors");
 const connectDB = require("./config/db");
+const errorHandler = require("./middleware/error");
 
 // Bootcamps route file
 const bootcamps = require("./routes/bootcamps");
@@ -27,6 +28,9 @@ if (process.env.NODE_ENV === "development") {
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
 
+// // Error Handler middleware
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 5000;
 
 // Run the app on .env.PORT or 5000 port as default port
@@ -36,9 +40,9 @@ const server = app.listen(PORT, () => {
 });
 
 // Handle unhandled promise rejections
-process.on("unhandledRejection", (error, promise) => {
-  // Print the error message
-  console.log(`${error && error.toString()} ❌`.underline.red);
+process.on("unhandledRejection", (err, promise) => {
+  // Print the err message
+  console.log(`${err && err.toString()} ❌`.underline.red);
 
   // Close the server & exit process
   server.close(() => process.exit(1));
