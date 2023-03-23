@@ -17,14 +17,19 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Import Bootcamp model
 const Bootcamp = require("./models/Bootcamp");
+const Course = require("./models/Course");
 
 // Load bootcamps
 const bootcamps = JSON.parse(
   fs.readFileSync(path.join(__dirname, "_data", "bootcamps.json"), "utf-8")
 );
+// Load courses
+const courses = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "_data", "courses.json"), "utf-8")
+);
 
 if (process.argv[2] === "-I" || process.argv[2] === "--import") {
-  importDocumentsIntoDB(bootcamps);
+  importDocumentsIntoDB();
 } else if (process.argv[2] === "-D" || process.argv[2] === "--destroy") {
   deleteAllDocumentsFromDB();
 } else {
@@ -40,9 +45,10 @@ if (process.argv[2] === "-I" || process.argv[2] === "--import") {
   process.exit();
 }
 
-async function importDocumentsIntoDB(documents) {
+async function importDocumentsIntoDB() {
   try {
-    await Bootcamp.create(documents);
+    await Bootcamp.create(bootcamps);
+    await Course.create(courses);
 
     console.log("Documents loaded success ✅".green);
     process.exit();
@@ -55,6 +61,7 @@ async function importDocumentsIntoDB(documents) {
 async function deleteAllDocumentsFromDB() {
   try {
     await Bootcamp.deleteMany();
+    await Course.deleteMany();
 
     console.log("Documents Deleting success ✅".green);
     process.exit();
