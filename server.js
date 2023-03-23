@@ -9,6 +9,7 @@ const errorHandler = require("./middleware/error");
 
 // Bootcamps route file
 const bootcamps = require("./routes/bootcamps");
+const courses = require("./routes/courses");
 
 // Connect to Database
 connectDB();
@@ -27,8 +28,9 @@ if (process.env.NODE_ENV === "development") {
 
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
+app.use("/api/v1/courses", courses);
 
-// // Error Handler middleware
+// Error Handler middleware
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
