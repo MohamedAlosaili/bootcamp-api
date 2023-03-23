@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
+const slugify = require("slugify");
+const geocoder = require("../utils/geocoder");
 
 // A Model convention is (Singular & Starting with uppercase)
-
 const BootcampSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -100,6 +101,46 @@ const BootcampSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+// Create Bootcamp slug from the name
+BootcampSchema.pre("save", function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+BootcampSchema.pre("save", async function (next) {
+  try {
+    const locations = await geocoder.geocode(this.address);
+    const {
+      formattedAddress,
+      streetName: street,
+      city,
+      stateCode: state,
+      zipcode,
+      country,
+      countryCode,
+      latitude,
+      longitude,
+    } = locations[0];
+
+    this.location = {
+      type: "Point",
+      coordinates: [longitude, latitude],
+      formattedAddress,
+      street,
+      city,
+      state,
+      zipcode,
+      country: country || countryCode,
+    };
+
+    this.address = undefined;
+
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = mongoose.model("Bootcamp", BootcampSchema);
