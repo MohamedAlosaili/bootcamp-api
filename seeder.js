@@ -50,11 +50,12 @@ async function importDocumentsIntoDB() {
     await Bootcamp.create(bootcamps);
     await Course.create(courses);
 
-    console.log("Documents loaded success ✅".green);
+    console.log("Documents loaded success ✅".green.inverse);
     process.exit();
   } catch (err) {
     console.log("Documents loaded faild ❌".red);
     console.log(err);
+    process.exit();
   }
 }
 
@@ -63,10 +64,11 @@ async function deleteAllDocumentsFromDB() {
     await Bootcamp.deleteMany();
     await Course.deleteMany();
 
-    console.log("Documents Deleting success ✅".green);
+    console.log("Documents Deleting success ✅".red.inverse);
     process.exit();
   } catch (err) {
     console.log("Documents Deleting failed ❌".red);
     console.log(err);
+    process.exit();
   }
 }
