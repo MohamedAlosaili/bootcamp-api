@@ -147,6 +147,16 @@ BootcampSchema.pre("save", async function (next) {
   }
 });
 
+/* 
+  Import Note:
+    - Statics called on the model itself
+      for example Bootcamp.create is statics 
+    
+    - On the other hand, methods call on the instance (or what you have returned) from the model
+      const bootcamp = Bootcamp.create({ ... })
+      bootcamp.method
+*/
+
 // Cascade delete - Delete courses of the bootcamp
 BootcampSchema.pre("remove", async function (next) {
   try {

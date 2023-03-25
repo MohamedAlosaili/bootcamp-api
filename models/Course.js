@@ -38,6 +38,16 @@ const CourseSchema = new mongoose.Schema({
   },
 });
 
+/* 
+  Import Note:
+    - Statics called on the model itself
+      for example Course.create is statics 
+    
+    - On the other hand, methods call on the instance (or what you have returned) from the model
+      const course = Course.create({ ... })
+      course.method
+*/
+
 // Static method to calc the average of courses tuitions
 CourseSchema.statics.getAverageCost = async function (bootcampId) {
   const obj = await this.aggregate([
