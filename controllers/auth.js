@@ -16,13 +16,10 @@ exports.register = asyncHandler(async (req, res, next) => {
     role,
   });
 
-  // Create token
-  const token = user.getSignedJwtToken();
-
-  res.status(200).json({ success: true, token });
+  sendTokenResponse(user, 201, res);
 });
 
-// @desc    login user
+// @desc    Login user
 // @route   POST /api/v1/auth/login
 // @access  Public
 exports.login = asyncHandler(async (req, res, next) => {
@@ -30,24 +27,12 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   // If email or password is not passed
   if (!email || !password) {
-    const missingValues = [];
-
-    if (!email) missingValues.push("email");
-    if (!password) missingValues.push("password");
-
-    const article = missingValues.includes("email") ? "an" : "a";
-    return next(
-      new ErrorResponse(
-        `Please provide ${article} ${missingValues.join(" and ")}`,
-        400
-      )
-    );
+    return next(new ErrorResponse("Please Provide an email and password", 400));
   }
 
-  // Check if the user exist
+  // Check user is exist
   const user = await User.findOne({ email }).select("+password");
 
-  // Check the email
   if (!user) {
     // I think it's better to specify why it's not valid e.g. Email doesn't exist
     // The instructor said it's not a good idea to hint
@@ -63,8 +48,29 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Invalid credentials`, 401));
   }
 
+  sendTokenResponse(user, 200, res);
+});
+
+// Get token from the model, create a cookie and send a response
+const sendTokenResponse = (user, statusCode, res) => {
   // Create token
   const token = user.getSignedJwtToken();
 
-  res.status(200).json({ success: true, token });
-});
+  const options = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+    ),
+    // httpOnly mean cookie cannot be accessed through client-side scripts, such as JavaScript.
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === "production") {
+    options.secure = true;
+  }
+
+  // Create cookie and send response
+  res
+    .status(statusCode)
+    .cookie("token", token, options)
+    .json({ success: true, token });
+};
