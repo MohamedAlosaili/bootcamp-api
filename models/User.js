@@ -16,20 +16,21 @@ const UserSchema = new mongoose.Schema({
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
       "Please add a valid email",
     ],
+    lowercase: true,
   },
   role: {
     type: String,
-    enum: ["user", "publisher"],
+    enum: {
+      values: ["user", "publisher"],
+      message: "{VALUE} not supported as role",
+    },
     default: "user",
   },
   password: {
     type: String,
     required: [true, "Please add a password"],
-    // match: [
-    //   /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+])(?=.*[a-zA-Z]).{8,}$/,
-    //   "Please add a valid password",
-    // ],
-    minlength: [6, "Password should be at lest 6 characters"],
+    minlength: [6, "6 characters minimum for password length."],
+    maxlength: [32, "32 characters maximum for password length."],
     select: false,
     // select: false will remove the password from the json that return from the database
   },
@@ -50,7 +51,7 @@ UserSchema.pre("save", async function (next) {
     this.password = passwordHashed;
     next();
   } catch (err) {
-    next(err);
+    console.error(err);
   }
 });
 
