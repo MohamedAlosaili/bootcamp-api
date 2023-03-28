@@ -18,6 +18,7 @@ mongoose.connect(process.env.MONGO_URI, {
 // Import Bootcamp model
 const Bootcamp = require("./models/Bootcamp");
 const Course = require("./models/Course");
+const User = require("./models/User");
 
 // Load bootcamps
 const bootcamps = JSON.parse(
@@ -27,10 +28,14 @@ const bootcamps = JSON.parse(
 const courses = JSON.parse(
   fs.readFileSync(path.join(__dirname, "_data", "courses.json"), "utf-8")
 );
+// Load users
+const users = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "_data", "users.json"), "utf-8")
+);
 
-if (process.argv[2] === "-I" || process.argv[2] === "--import") {
+if (process.argv[2] === "-i" || process.argv[2] === "--import") {
   importDocumentsIntoDB();
-} else if (process.argv[2] === "-D" || process.argv[2] === "--destroy") {
+} else if (process.argv[2] === "-d" || process.argv[2] === "--destroy") {
   deleteAllDocumentsFromDB();
 } else {
   console.error(`
@@ -38,9 +43,9 @@ if (process.argv[2] === "-I" || process.argv[2] === "--import") {
 
         Available flags:
 
-        -I, --import      to import data into the database
+        -i, --import      to import data into the database
 
-        -D, --destroy     Delete all the data in the database
+        -d, --destroy     Delete all the data in the database
     `);
   process.exit();
 }
@@ -49,6 +54,7 @@ async function importDocumentsIntoDB() {
   try {
     await Bootcamp.create(bootcamps);
     await Course.create(courses);
+    await User.create(users);
 
     console.log("Documents loaded success ✅".green.inverse);
     process.exit();
@@ -63,6 +69,7 @@ async function deleteAllDocumentsFromDB() {
   try {
     await Bootcamp.deleteMany();
     await Course.deleteMany();
+    await User.deleteMany();
 
     console.log("Documents Deleting success ✅".red.inverse);
     process.exit();
