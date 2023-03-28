@@ -3,13 +3,14 @@ require("dotenv").config({ path: "./config/config.env" });
 
 const path = require("path");
 const express = require("express");
+const connectDB = require("./config/db");
 const morgan = require("morgan");
 const colors = require("colors");
-const connectDB = require("./config/db");
-const errorHandler = require("./middleware/error");
+const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
+const errorHandler = require("./middleware/error");
 
-// Bootcamps route file
+// Route files
 const bootcamps = require("./routes/bootcamps");
 const courses = require("./routes/courses");
 const auth = require("./routes/auth");
@@ -23,6 +24,10 @@ const app = express();
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Cookie parser middleware
+// Now we have access to res.cookie() and req.signedCookie
+app.use(cookieParser());
 
 // Dev middleware logger
 if (process.env.NODE_ENV === "development") {
