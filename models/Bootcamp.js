@@ -62,7 +62,7 @@ const BootcampSchema = new mongoose.Schema(
       // Array of strings
       type: [String],
       required: true,
-      // enum mean values will be only one of those [value1, value2, etc].
+      // enum helps to specify the accepted values [value1, value2, etc].
       enum: [
         "Web Development",
         "Mobile Development",
@@ -102,9 +102,19 @@ const BootcampSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
+  // These two object are important to add virtuals fields
+  // when the document is converting to JSON or plain Object
   { toJSON: { virtuals: true } },
   { toObject: { virtuals: true } }
+  // another way to add those objects:
+  // BootcampSchema.set('toObject', { virtuals: true });
+  // BootcampSchema.set('toJSON', { virtuals: true });
 );
 
 // Create Bootcamp slug from the name
@@ -160,7 +170,6 @@ BootcampSchema.pre("save", async function (next) {
 // Cascade delete - Delete courses of the bootcamp
 BootcampSchema.pre("remove", async function (next) {
   try {
-    console.log(this._id);
     await this.model("Course").deleteMany({ bootcamp: this._id });
     next();
   } catch (err) {
