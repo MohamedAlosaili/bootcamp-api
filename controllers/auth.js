@@ -62,6 +62,46 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: user });
 });
 
+// @desc    Update current loggedin user details
+// @route   PUT /api/v1/auth/updatedetails
+// @access  Private
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+  const { email, name } = req.body;
+
+  const details = {};
+  if (email) details.email = email;
+  if (name) details.name = name;
+
+  const user = await User.findByIdAndUpdate(req.user.id, details, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({ success: true, data: user });
+});
+
+// @desc    Update current loggedin user password
+// @route   PUT /api/v1/auth/updatepassword
+// @access  Private
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await User.findById(req.user.id).select("+password");
+
+  // Check if cuurent password is correct
+  const isPasswordMatch = await user.matchPassword(currentPassword);
+
+  if (!isPasswordMatch) {
+    return next(new ErrorResponse("Current password is incorrect", 401));
+  }
+
+  user.password = newPassword;
+
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
+});
+
 // @desc    Forgot password
 // @route   PSOT /api/v1/auth/forgotpassword
 // @access  Public
