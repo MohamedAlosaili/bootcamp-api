@@ -46,7 +46,7 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
   // Add user id to the bootcamp document
   req.body.user = req.user.id;
 
-  let allwoedToCreate = false;
+  let allowedToCreate = false;
 
   // Users not admin can only create one bootcamp
   if (req.user.role !== "admin") {
@@ -54,11 +54,11 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
     const userOwnsBootcamp = await Bootcamp.findOne({ user: req.user.id });
 
     if (!userOwnsBootcamp) {
-      allwoedToCreate = true;
+      allowedToCreate = true;
     }
-  } else allwoedToCreate = true;
+  } else allowedToCreate = true;
 
-  if (!allwoedToCreate) {
+  if (!allowedToCreate) {
     return next(
       new ErrorResponse(
         `The user with id ${req.user.id} has already published a bootcamp`,
@@ -134,9 +134,8 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
   const { zipcode, distance } = req.params;
-  console.log(zipcode);
 
-  // get lat/long from geocoder
+  // get lat & long from geocoder
   const location = await geocoder.geocode(zipcode);
   const { longitude, latitude } = location[0];
 
