@@ -1,4 +1,5 @@
 const express = require("express");
+
 const router = express.Router({ mergeParams: true });
 
 const {
@@ -11,8 +12,8 @@ const {
 
 // Protection middleware for protected routes
 const { protect, authorize } = require("../middleware/auth");
-
 const advancedResults = require("../middleware/advancedResults");
+
 const Course = require("../models/Course");
 
 router
