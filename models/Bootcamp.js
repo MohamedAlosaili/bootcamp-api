@@ -185,4 +185,12 @@ BootcampSchema.virtual("courses", {
   justOne: false,
 });
 
+// Reverse populate with virtuals - Shows all reviews related to each bootcamp
+BootcampSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "bootcamp",
+  justOne: false,
+});
+
 module.exports = mongoose.model("Bootcamp", BootcampSchema);
