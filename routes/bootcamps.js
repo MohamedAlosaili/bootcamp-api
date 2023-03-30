@@ -13,6 +13,7 @@ const {
 } = require("../controllers/bootcamps");
 
 const courseRouter = require("./courses");
+const reviewRouter = require("./reviews");
 
 // Protection middleware for protected routes
 const { protect, authorize } = require("../middleware/auth");
@@ -22,10 +23,11 @@ const Bootcamp = require("../models/Bootcamp");
 
 // Re-route into other resource routers
 router.use("/:bootcampId/courses", courseRouter);
+router.use("/:bootcampId/reviews", reviewRouter);
 
 router
   .route("/")
-  .get(advancedResults(Bootcamp, "courses"), getBootcamps)
+  .get(advancedResults(Bootcamp, ["courses", "reviews"]), getBootcamps)
   .post(protect, authorize("admin", "publisher"), createBootcamp);
 
 router
