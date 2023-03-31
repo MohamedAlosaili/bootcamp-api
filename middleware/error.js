@@ -9,19 +9,15 @@ async function errorHandler(err, req, res, next) {
   // Mongoose wrong ID
   if (err.name === "CastError") {
     error = new ErrorResponse(
-      `Resourse not found with id of ${err.value}`,
+      `Resource not found with id of ${err.value}`,
       404
     );
   }
 
   // Mongoose duplicate key (document has a unique key that already exists).
   if (err.code === 11000) {
-    error = new ErrorResponse(
-      `${Object.keys(err.keyValue)[0]} "${
-        Object.values(err.keyValue)[0]
-      }" already exist in the database`,
-      400
-    );
+    console.log(err);
+    error = new ErrorResponse("Duplicate field value entered", 400);
   }
 
   // Mongoose invalid values
