@@ -6,15 +6,19 @@ const User = require("../models/User");
 exports.protect = asyncHandler(async (req, res, next) => {
   let token;
 
+  // You have two ways to access token
+  // You can choose one of them or both of them it's up to you
+  // how you want to handle the token
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
   ) {
+    // Here the token should be embedded in the request header Authorization
     token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.token) {
+    // Here you can access the token from the cookie that we have saved in the login/register controller methods
+    token = req.cookies.token;
   }
-  //   else if (req.cookies.token) {
-  //     token = req.cookies.token;
-  //   }
 
   // Make sure token is exist
   if (!token) {
