@@ -9,6 +9,12 @@ const colors = require("colors");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const errorHandler = require("./middleware/error");
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
+const cors = require("cors");
 
 // Route files
 const bootcamps = require("./routes/bootcamps");
@@ -26,6 +32,26 @@ const app = express();
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// # Securty middlewares #
+// Sanitize Data to prevent NoSQL injection
+app.use(mongoSanitize());
+// Helmet secure Express app by setting various HTTP security headers.
+app.use(helmet());
+// Prevent cross-site scripting (XSS) attack
+app.use(xss());
+// Limit requests per id to 60 request per minute
+// You can limit certain routes e.g. resetpassword route
+app.use(
+  rateLimit({
+    windowMs: 5 * 60 * 1000, // 60 request limit per 5 minutes
+    max: 60,
+  })
+);
+// Protect against HTTP Parameter Pollution attacks
+app.use(hpp());
+// CORS enable other domains to connect and make requests to this API
+app.use(cors());
 
 // Cookie parser middleware
 // Now we have access to res.cookie() and req.signedCookie
