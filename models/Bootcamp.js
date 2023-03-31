@@ -177,6 +177,16 @@ BootcampSchema.pre("remove", async function (next) {
   }
 });
 
+// Cascade delete - Delete reviews of the bootcamp
+BootcampSchema.pre("remove", async function (next) {
+  try {
+    await this.model("Review").deleteMany({ bootcamp: this._id });
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Reverse populate with virtuals - Shows all courses related to each bootcamp
 BootcampSchema.virtual("courses", {
   ref: "Course",
